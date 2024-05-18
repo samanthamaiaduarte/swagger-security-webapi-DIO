@@ -2,8 +2,8 @@ package com.smd.webapi.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,7 +17,6 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 public class WebSecurityConfig {
     @Bean
     InMemoryUserDetailsManager userDetailsService(PasswordEncoder encoder) {
@@ -39,6 +38,18 @@ public class WebSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+    	.authorizeHttpRequests(auth -> auth
+        		.requestMatchers("/login").permitAll()
+        		
+        		.requestMatchers(HttpMethod.GET, "/users/**").hasAnyRole("USER", "ADMIN")
+        		
+        		.requestMatchers(HttpMethod.POST, "/users/**").hasRole("ADMIN")
+        		.requestMatchers(HttpMethod.PUT, "/users/**").hasRole("ADMIN")
+        		.requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+        		
+        		.requestMatchers("/").hasRole("ADMIN")
+        		.anyRequest().authenticated()
+        	)
     	.csrf(AbstractHttpConfigurer::disable)
     	.formLogin(Customizer.withDefaults()).logout(logout -> logout.logoutUrl("/logout"))
     	.httpBasic(Customizer.withDefaults());
