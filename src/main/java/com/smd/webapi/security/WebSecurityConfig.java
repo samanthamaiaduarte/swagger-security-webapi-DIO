@@ -1,38 +1,26 @@
 package com.smd.webapi.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.User.UserBuilder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
-    @Bean
-    InMemoryUserDetailsManager userDetailsService(PasswordEncoder encoder) {
-    	UserBuilder users = User.builder();
-		UserDetails user = users
-				.username("teste")
-				.password(encoder.encode("Teste123"))
-				.roles("USER")
-				.build();
-		UserDetails admin = users
-				.username("admin")
-				.password(encoder.encode("Teste456"))
-				.roles("ADMIN")
-				.build();
-		
-		return new InMemoryUserDetailsManager(user, admin);
+    @Autowired
+    private SecurityDatabaseService securityService;
+    
+    @Autowired
+    public void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(securityService).passwordEncoder(new BCryptPasswordEncoder());
     }
     
     @Bean
@@ -40,6 +28,7 @@ public class WebSecurityConfig {
         http
     	.authorizeHttpRequests(auth -> auth
         		.requestMatchers("/login").permitAll()
+        		.requestMatchers("/h2-console/**").permitAll()
         		
         		.requestMatchers(HttpMethod.GET, "/users/**").hasAnyRole("USER", "ADMIN")
         		
@@ -54,12 +43,7 @@ public class WebSecurityConfig {
     	.formLogin(Customizer.withDefaults()).logout(logout -> logout.logoutUrl("/logout"))
     	.httpBasic(Customizer.withDefaults());
     
-    return http.build();
-}
-    
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return http.build();
     }
     
 }
