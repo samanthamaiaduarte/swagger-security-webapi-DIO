@@ -32,7 +32,6 @@ public class StartApplication implements CommandLineRunner {
     		user.addRole("ADMIN");
     		repository.save(user);
     	}
-		
 	}
 
 }

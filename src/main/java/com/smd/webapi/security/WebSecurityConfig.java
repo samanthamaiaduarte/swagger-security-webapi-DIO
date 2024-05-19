@@ -1,5 +1,7 @@
 package com.smd.webapi.security;
 
+import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +11,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -28,7 +31,7 @@ public class WebSecurityConfig {
         http
     	.authorizeHttpRequests(auth -> auth
         		.requestMatchers("/login").permitAll()
-        		.requestMatchers("/h2-console/**").permitAll()
+        		.requestMatchers(toH2Console()).permitAll()
         		
         		.requestMatchers(HttpMethod.GET, "/users/**").hasAnyRole("USER", "ADMIN")
         		
@@ -40,6 +43,7 @@ public class WebSecurityConfig {
         		.anyRequest().authenticated()
         	)
     	.csrf(AbstractHttpConfigurer::disable)
+    	.headers(headers -> headers.frameOptions(FrameOptionsConfig::disable))
     	.formLogin(Customizer.withDefaults()).logout(logout -> logout.logoutUrl("/logout"))
     	.httpBasic(Customizer.withDefaults());
     
