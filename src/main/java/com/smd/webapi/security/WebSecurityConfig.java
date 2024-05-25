@@ -19,7 +19,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    private static final String[] SWAGGER_WHITELIST = {"/v3/api-docs","/swagger-resources","/swagger-resources/**","/configuration/ui","/configuration/security","/api-docs.html","/swagger-ui.html","/webjars/**"};	
+    private static final String[] SWAGGER_WHITELIST = {"/v3/api-docs",
+    		                                           "/api-docs/**",
+    		                                           "/swagger-ui",
+    		                                           "/swagger-ui/**",
+    		                                           "/swagger-resources",
+    		                                           "/swagger-resources/**",
+    		                                           "/api-docs.html"};	
     
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
