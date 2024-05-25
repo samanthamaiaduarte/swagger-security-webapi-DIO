@@ -2,35 +2,32 @@ package com.smd.webapi;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.smd.webapi.model.Login;
-import com.smd.webapi.repository.LoginRepository;
+import com.smd.webapi.service.LoginService;
 
 @Component
 public class StartApplication implements CommandLineRunner {
     @Autowired
-    private LoginRepository repository;
+    private LoginService service;
     
     @Transactional
 	@Override
 	public void run(String... args) throws Exception {
-    	BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-    	
-    	Login user = repository.findByUsername("teste");
-    	if(user == null) {
-    		user = new Login("TESTE", "teste", encoder.encode("Teste123"));
-    		user.addRole("USER");
-    		repository.save(user);
+    	Login login = service.findByUsername("teste");
+    	if(login == null) {
+    		login = new Login("TESTE", "teste", "Teste123");
+    		login.addRole("USER");
+    		service.createLogin(login);
     	}
     	
-    	user = repository.findByUsername("admin");
-    	if(user == null) {
-    		user = new Login("ADMIN", "admin", encoder.encode("Teste456"));
-    		user.addRole("ADMIN");
-    		repository.save(user);
+    	login = service.findByUsername("admin");
+    	if(login == null) {
+    		login = new Login("ADMIN", "admin", "Teste456");
+    		login.addRole("ADMIN");
+    		service.createLogin(login);
     	}
 	}
 

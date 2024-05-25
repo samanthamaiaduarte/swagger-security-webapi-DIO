@@ -13,18 +13,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.smd.webapi.model.Login;
-import com.smd.webapi.repository.LoginRepository;
+import com.smd.webapi.service.LoginService;
 
 @Service
 public class SecurityDatabaseService implements UserDetailsService {
 	
     @Autowired
-    private LoginRepository repository;
+    private LoginService service;
     
     @Override
     public UserDetails loadUserByUsername(String username) {
         
-    	Login logins = repository.findByUsername(username);
+    	Login logins = service.findByUsername(username);
         if (logins == null) {
             throw new UsernameNotFoundException(username);
         }

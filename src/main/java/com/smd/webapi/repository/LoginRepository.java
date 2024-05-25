@@ -9,4 +9,6 @@ import com.smd.webapi.model.Login;
 public interface LoginRepository extends JpaRepository<Login, Integer> {
     @Query("SELECT e FROM Login e JOIN FETCH e.roles WHERE e.username= (:username)")
     public Login findByUsername(@Param("username") String username);
+    
+    boolean existsByUsername(String Username);
 }
